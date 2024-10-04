@@ -3,7 +3,7 @@
  * built on top of the base `Map` class, providing additional generic and
  * specialised functionality.
  * 
- * @module Map
+ * @module Data.Map
  */
 
 export * from "./BaseMap.js";

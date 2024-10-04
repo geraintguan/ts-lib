@@ -1,3 +1,6 @@
+/**
+ * Interface that all map data structure si this library implement.
+ */
 export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
   /**
    * Clears all elements from this map.
@@ -32,7 +35,7 @@ export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
    *
    * @returns The key deserialized from a string.
    */
-  deserializeKey: (key: string) => TKey;
+  readonly deserializeKey: (key: string) => TKey;
 
   /**
    * Returns an iterable iterator that allows iterating over the each
@@ -72,7 +75,7 @@ export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
   getOr<TDefaultValue = TValue>(
     key: TKey,
     defaultValue: TDefaultValue,
-  ): TValue | TDefaultValue;
+  ): TDefaultValue | TValue;
 
   /**
    * Returns the existence of an entry with the given key in this map.
@@ -93,6 +96,16 @@ export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
   keys(): IterableIterator<TKey>;
 
   /**
+   * Human readable name of this map.
+   * 
+   * @remarks
+   * This optional value is used in log and error messages to help identify
+   * which of your maps is being referred to. If you do not provide a name
+   * `"unknown"` will be used instead.
+   */
+  readonly name?: string;
+
+  /**
    * Returns the serialized keys in this map.
    *
    * @returns Iterator over serialized keys in the map.
@@ -107,7 +120,7 @@ export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
    *
    * @returns The key serialized into a string.
    */
-  serializeKey: (key: TKey) => string;
+  readonly serializeKey: (key: TKey) => string;
 
   /**
    * Set a value in the map with the given key.
@@ -117,6 +130,16 @@ export interface BaseMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
    * @param value - Value to set in the map.
    */
   set(key: TKey, value: TValue): void;
+
+  /**
+   * Human readable name of the map implementation.
+   * 
+   * @remarks
+   * This is used in log and error messages to help identify the implementation
+   * of the map being referred to. It can also be effectively used as a
+   * discriminator value for map implementations.
+   */
+  readonly typename: string;
 
   /**
    * Returns an iterable iterator that allows iterating over the values

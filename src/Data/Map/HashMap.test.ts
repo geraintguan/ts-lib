@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { HashMap } from "./HashMap.js";
 import { MissingKeyError } from "./MissingKeyError.js";
 
@@ -138,7 +139,7 @@ describe("HashMap#delete()", () => {
       ["c", 3],
     ]);
 
-    expect(() => map.delete("b")).not.toThrowError(MissingKeyError);
+    expect(() => { map.delete("b"); }).not.toThrowError(MissingKeyError);
 
     expect(Array.from(map.entries())).toEqual([
       ["a", 1],
@@ -153,7 +154,7 @@ describe("HashMap#delete()", () => {
       ["c", 3],
     ]);
 
-    expect(() => map.delete("d")).toThrowError(MissingKeyError);
+    expect(() => { map.delete("d"); }).toThrowError(MissingKeyError);
 
     expect(Array.from(map.entries())).toEqual([
       ["a", 1],
@@ -343,7 +344,7 @@ describe("HashMap#map()", () => {
       ["b", 2],
       ["c", 3],
     ]);
-    const newMap = map.map((value, key) => [`${key}${value}`, value * 2]);
+    const newMap = map.map((value, key) => [`${key}${value.toString()}`, value * 2]);
     expect(Array.from(newMap.entries())).toEqual([
       ["a1", 2],
       ["b2", 4],

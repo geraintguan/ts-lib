@@ -2,6 +2,18 @@ import { BaseMap } from "./BaseMap.js";
 import { HashMap } from "./HashMap.js";
 
 export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
+  public readonly typename = "DefaultMap";
+
+  constructor(
+    protected readonly internalMap: HashMap<TKey, TValue> = HashMap.empty(),
+    protected readonly defaultValue: (
+      key: TKey,
+      self: DefaultMap<TKey, TValue>,
+    ) => TValue,
+    public readonly name?: string,
+  ) {
+  }
+
   static empty<TKey, TValue>(
     defaultValue: (key: TKey, self: DefaultMap<TKey, TValue>) => TValue,
     options: {
@@ -35,37 +47,24 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
     );
   }
 
-  constructor(
-    private readonly _data: HashMap<TKey, TValue> = HashMap.empty(),
-    private readonly _defaultValue: (
-      key: TKey,
-      self: DefaultMap<TKey, TValue>,
-    ) => TValue,
-    public readonly instanceName?: string,
-  ) {}
-
-  [Symbol.iterator](): Iterator<[TKey, TValue]> {
-    return this.entries();
-  }
-
   clear(): void {
-    this._data.clear();
+    this.internalMap.clear();
   }
 
   delete(key: TKey): void {
-    this._data.delete(key);
+    this.internalMap.delete(key);
   }
 
   deleteIfExists(key: TKey): boolean {
-    return this._data.deleteIfExists(key);
+    return this.internalMap.deleteIfExists(key);
   }
 
   deserializeKey(key: string): TKey {
-    return this._data.deserializeKey(key);
+    return this.internalMap.deserializeKey(key);
   }
 
   entries(): IterableIterator<[TKey, TValue]> {
-    return this._data.entries();
+    return this.internalMap.entries();
   }
 
   filter(
@@ -79,7 +78,7 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
     const entries: [TKey, TValue][] = [];
 
     let index = 0;
-    for (const [key, value] of this._data.entries()) {
+    for (const [key, value] of this.internalMap.entries()) {
       if (fn(value, key, index, this)) {
         entries.push([key, value]);
       }
@@ -87,37 +86,37 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
       index++;
     }
 
-    return DefaultMap.fromEntries(entries, this._defaultValue, {
-      deserializeKey: this._data.deserializeKey,
-      serializeKey: this._data.serializeKey,
+    return DefaultMap.fromEntries(entries, this.defaultValue, {
+      deserializeKey: this.internalMap.deserializeKey,
+      serializeKey: this.internalMap.serializeKey,
     });
   }
 
   get(key: TKey): TValue {
     if (!this.has(key)) {
-      const defaultValue = this._defaultValue(key, this);
+      const defaultValue = this.defaultValue(key, this);
 
       this.set(key, defaultValue);
 
       return defaultValue;
     }
 
-    return this._data.get(key);
+    return this.internalMap.get(key);
   }
 
   getOr<TDefaultValue = TValue>(
     key: TKey,
     defaultValue: TDefaultValue,
-  ): TValue | TDefaultValue {
-    return this._data.getOr(key, defaultValue);
+  ): TDefaultValue | TValue {
+    return this.internalMap.getOr(key, defaultValue);
   }
 
   has(key: TKey): boolean {
-    return this._data.has(key);
+    return this.internalMap.has(key);
   }
 
   keys(): IterableIterator<TKey> {
-    return this._data.keys();
+    return this.internalMap.keys();
   }
 
   map(
@@ -131,15 +130,15 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
     const entries: [TKey, TValue][] = [];
 
     let index = 0;
-    for (const [key, value] of this._data.entries()) {
+    for (const [key, value] of this.internalMap.entries()) {
       entries.push(fn(value, key, index, this));
 
       index++;
     }
 
-    return DefaultMap.fromEntries<TKey, TValue>(entries, this._defaultValue, {
-      deserializeKey: this._data.deserializeKey,
-      serializeKey: this._data.serializeKey,
+    return DefaultMap.fromEntries<TKey, TValue>(entries, this.defaultValue, {
+      deserializeKey: this.internalMap.deserializeKey,
+      serializeKey: this.internalMap.serializeKey,
     });
   }
 
@@ -154,15 +153,15 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
     const entries: [TKey, TValue][] = [];
 
     let index = 0;
-    for (const [key, value] of this._data.entries()) {
+    for (const [key, value] of this.internalMap.entries()) {
       entries.push([fn(key, value, index, this), value]);
 
       index++;
     }
 
-    return DefaultMap.fromEntries<TKey, TValue>(entries, this._defaultValue, {
-      deserializeKey: this._data.deserializeKey,
-      serializeKey: this._data.serializeKey,
+    return DefaultMap.fromEntries<TKey, TValue>(entries, this.defaultValue, {
+      deserializeKey: this.internalMap.deserializeKey,
+      serializeKey: this.internalMap.serializeKey,
     });
   }
 
@@ -177,31 +176,35 @@ export class DefaultMap<TKey, TValue> implements BaseMap<TKey, TValue> {
     const entries: [TKey, TValue][] = [];
 
     let index = 0;
-    for (const [key, value] of this._data.entries()) {
+    for (const [key, value] of this.internalMap.entries()) {
       entries.push([key, fn(value, key, index, this)]);
 
       index++;
     }
 
-    return DefaultMap.fromEntries<TKey, TValue>(entries, this._defaultValue, {
-      deserializeKey: this._data.deserializeKey,
-      serializeKey: this._data.serializeKey,
+    return DefaultMap.fromEntries<TKey, TValue>(entries, this.defaultValue, {
+      deserializeKey: this.internalMap.deserializeKey,
+      serializeKey: this.internalMap.serializeKey,
     });
   }
 
-  serializeKey(key: TKey): string {
-    return this._data.serializeKey(key);
+  serializedKeys(): IterableIterator<string> {
+    return this.internalMap.serializedKeys();
   }
 
-  serializedKeys(): IterableIterator<string> {
-    return this._data.serializedKeys();
+  serializeKey(key: TKey): string {
+    return this.internalMap.serializeKey(key);
   }
 
   set(key: TKey, value: TValue): void {
-    this._data.set(key, value);
+    this.internalMap.set(key, value);
+  }
+
+  [Symbol.iterator](): Iterator<[TKey, TValue]> {
+    return this.entries();
   }
 
   values(): IterableIterator<TValue> {
-    return this._data.values();
+    return this.internalMap.values();
   }
 }

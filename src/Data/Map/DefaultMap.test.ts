@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import { constant } from "../../constant.js";
+import { Unpack } from "../../Types/Unpack.js";
 import { DefaultMap } from "./DefaultMap.js";
-import { identity } from "../identity.js";
 import { MissingKeyError } from "./MissingKeyError.js";
 
 describe("DefaultMap.empty()", () => {
   it("should return an empty DefaultMap that uses the given default value", () => {
-    const map = DefaultMap.empty<string, string>(identity("Default Value"));
+    const map = DefaultMap.empty<string, string>(constant("Default Value"));
 
     expect(Array.from(map)).toEqual([]);
 
@@ -21,7 +23,7 @@ describe("DefaultMap.fromEntries()", () => {
       ["c", "cherry"],
     ];
 
-    const map = DefaultMap.fromEntries(entries, identity("Default Value"));
+    const map = DefaultMap.fromEntries(entries, constant("Default Value"));
     expect(Array.from(map)).toEqual(entries);
   });
 
@@ -34,7 +36,7 @@ describe("DefaultMap.fromEntries()", () => {
 
     const defaultValue = "Default Value";
 
-    const map = DefaultMap.fromEntries(entries, identity(defaultValue));
+    const map = DefaultMap.fromEntries(entries, constant(defaultValue));
 
     expect(map.get("d")).toBe(defaultValue);
     expect(map.get("e")).toBe(defaultValue);
@@ -46,9 +48,9 @@ describe("DefaultMap.fromEntries()", () => {
       [{ id: 2 }, "banana"],
       [{ id: 3 }, "cherry"],
     ];
-    const deserializeKey = (key: string) => JSON.parse(key);
+    const deserializeKey = (key: string) => JSON.parse(key) as Unpack<typeof entries>[0];
 
-    const map = DefaultMap.fromEntries(entries, identity("Default Value"), {
+    const map = DefaultMap.fromEntries(entries, constant("Default Value"), {
       deserializeKey,
     });
 
@@ -65,7 +67,7 @@ describe("DefaultMap.fromEntries()", () => {
     ];
     const serializeKey = (key: { id: number }) => JSON.stringify(key);
 
-    const map = DefaultMap.fromEntries(entries, identity("Default Value"), {
+    const map = DefaultMap.fromEntries(entries, constant("Default Value"), {
       serializeKey,
     });
 
@@ -156,7 +158,7 @@ describe("DefaultMap#delete()", () => {
       () => 0,
     );
 
-    expect(() => map.delete("d")).toThrowError(MissingKeyError);
+    expect(() => { map.delete("d"); }).toThrowError(MissingKeyError);
   });
 });
 

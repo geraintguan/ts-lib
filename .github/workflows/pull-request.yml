@@ -2,9 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches:
-      - main
-
+    branches: [main]
 jobs:
   coverage:
     name: Upload test coverage to codecov.io
@@ -23,6 +21,3 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm run coverage
-      - uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}

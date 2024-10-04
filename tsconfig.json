@@ -1,9 +1,11 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
-  "include": ["src"],
-  "exclude": ["node_modules"],
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs"
-  }
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
