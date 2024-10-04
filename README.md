@@ -1,3 +1,5 @@
 # ts-lib
 
-A practical and pragmatic standard library for TypeScript.
+A practical and pragmatic standard library for TypeScript (and JavaScript).
+
+- [ ] Add prettier
